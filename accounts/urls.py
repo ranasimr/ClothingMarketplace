@@ -11,4 +11,6 @@ urlpatterns =[
     
      
     path('home/', views.homepage, name='home'),
+    path('activate/<uidb64>/<token>/',views.activate , name='activate'),
+
 ]

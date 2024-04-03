@@ -150,8 +150,23 @@ MESSAGE_TAGS = {
     messages.ERROR: "danger",
     
 }
-# EMAIL_HOST ='smtp.gmail.com'
-# EMAIL_PORT =587
-# EMAIL_HOST_USER ='trendify202@gmail.com'
-# EMAIL_PASSWORD ='nkkusxjztizssbny'
-# EMAIL_USE_TLS = True
+# import os
+# from dotenv import load_dotenv
+
+# # Load environment variables from .env file
+# load_dotenv()
+
+# # Get email settings from environment variables
+# EMAIL_HOST = os.getenv('EMAIL_HOST')
+# EMAIL_PORT = os.getenv('EMAIL_PORT')
+# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+# EMAIL_USE_TLS = True  # Use TLS for secure connection
+
+# # Update the existing EMAIL_BACKEND setting to use SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST ='smtp.gmail.com'
+EMAIL_PORT =587
+EMAIL_HOST_USER ='trendify202@gmail.com'
+EMAIL_HOST_PASSWORD ='psgpjsxkejnvjzjz'
+EMAIL_USE_TLS = True
