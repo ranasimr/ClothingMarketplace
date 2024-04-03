@@ -1,8 +1,25 @@
 from django.shortcuts import render,redirect
 from .forms import RegistrationForm  
 from .models import  Account
-from django.contrib import messages             
+from django.contrib import messages, auth    
+from django.contrib.auth.decorators import  login_required   
+from django.urls import reverse 
+from django.http import HttpResponseRedirect 
+from stores.models import Product
+
 # Create your views here.
+
+def homepage(request):
+
+     products=Product.objects.all().filter(is_available=True)
+
+     context={
+
+        'products': products,
+    }
+    
+    # Add any logic here for the home page
+     return render(request, 'home.html',context)
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -27,7 +44,24 @@ def register(request):
     return render (request, 'accounts/register.html',context)
 
 def login(request):
+    if request.method =='POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        user = auth.authenticate(email=email, password=password)
+
+        if user is not None:
+            auth.login(request,user)
+            # messages.success(request,"You are now logged in")
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            messages.error(request,'Invalid login credentials')
+            return redirect('login')
+        
     return render (request, 'accounts/login.html')
 
+
+@login_required(login_url='login')
 def logout(request):
-    return 
+     auth.logout(request)
+     messages.success(request,'You are Logged Out')
+     return HttpResponseRedirect(reverse('login'))
