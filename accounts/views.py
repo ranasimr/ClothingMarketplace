@@ -51,8 +51,8 @@ def login(request):
 
         if user is not None:
             auth.login(request,user)
-            # messages.success(request,"You are now logged in")
-            return HttpResponseRedirect(reverse('home'))
+            messages.success(request,"You are now logged in")
+            return redirect('dashboard')
         else:
             messages.error(request,'Invalid login credentials')
             return redirect('login')
@@ -65,3 +65,10 @@ def logout(request):
      auth.logout(request)
      messages.success(request,'You are Logged Out')
      return HttpResponseRedirect(reverse('login'))
+
+
+@login_required(login_url='login')
+def dashboard(request):
+    return render(request,'accounts/dashboard.html')
+
+    
