@@ -1,12 +1,11 @@
-from django.shortcuts import render,redirect
-from django.http import HttpResponse
+from django.shortcuts import HttpResponse
+from django.shortcuts import render, redirect
 from carts.models import CartItem
 from .forms import OrderForm
 import datetime
 from .models import Order
 
-# Create your views here.
-def place_order(request,total=0, quantity=0,):
+def place_order(request, total=0, quantity=0):
     current_user = request.user
 
     # If the cart count is less than or equal to 0, then redirect back to shop
@@ -14,7 +13,6 @@ def place_order(request,total=0, quantity=0,):
     cart_count = cart_items.count()
     if cart_count <= 0:
         return redirect('store')
-    
 
     grand_total = 0
     tax = 0
@@ -44,19 +42,25 @@ def place_order(request,total=0, quantity=0,):
             data.tax = tax
             data.ip = request.META.get('REMOTE_ADDR')
             data.save()
-
-             # Generate order number
+            # Generate order number
             yr = int(datetime.date.today().strftime('%Y'))
             dt = int(datetime.date.today().strftime('%d'))
             mt = int(datetime.date.today().strftime('%m'))
-            d = datetime.date(yr,mt,dt)
-            current_date = d.strftime("%Y%m%d") #20240404
+            d = datetime.date(yr, mt, dt)
+            current_date = d.strftime("%Y%m%d") #20210305
             order_number = current_date + str(data.id)
             data.order_number = order_number
             data.save()
             return redirect('checkout')
-        else:
-          return redirect('checkout')
-        
-             
+            
            
+    else:
+            # # Add print statement to debug form errors
+            # print("Form is not valid:", form.errors)
+        return redirect('checkout')
+    # else:
+    #     # Add print statement to verify that request method is not POST
+    #     print("Request method is not POST")
+
+    # # Redirect to checkout if the request method is not POST
+    # return redirect('checkout')
