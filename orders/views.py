@@ -7,10 +7,15 @@ from .models import Order,Payment
 import json
 
 def payments(request):
-    if request.method == 'POST':
+    # if request.method == 'POST':
         
             body = json.loads(request.body)
-            order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['ordeID'])
+            try:
+                  order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
+            except Order.DoesNotExist:
+             # Handle the case where the order doesn't exist
+                     return HttpResponse("Order not found")
+            # order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
            
 
             payment = Payment(
@@ -25,7 +30,7 @@ def payments(request):
             order.payment = payment
             order.is_ordered = True
             order.save()
-            return render(request,'orders/payment.html')
+            return render(request,'orders/payments.html')
 
            
            
@@ -77,6 +82,7 @@ def place_order(request, total=0, quantity=0):
             data.order_number = order_number
             data.save()
 
+            
 
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
             context = {
