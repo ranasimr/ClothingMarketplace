@@ -10,7 +10,7 @@ def payments(request):
     if request.method == 'POST':
         
             body = json.loads(request.body)
-            order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['ordeID'])
+            order = Order.objects.get(user=request.user, is_ordered=False, order_number=body['orderID'])
            
 
             payment = Payment(
@@ -25,7 +25,7 @@ def payments(request):
             order.payment = payment
             order.is_ordered = True
             order.save()
-            return render(request,'orders/payment.html')
+            return render(request,'orders/payments.html')
 
            
            
