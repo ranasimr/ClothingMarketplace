@@ -271,12 +271,19 @@ def edit_profile(request):
     else:
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=userprofile)
+    
+    # Check if profile picture exists
+    profile_picture_url = None
+    if userprofile.profile_picture:
+        profile_picture_url = userprofile.profile_picture.url
+
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
         'userprofile': userprofile,
+        'profile_picture_url': profile_picture_url,  # Pass profile picture URL to the template
     }
-    return render(request, 'accounts/edit_profile.html',context ) 
+    return render(request, 'accounts/edit_profile.html', context)
  
 @login_required(login_url='login')
 def change_password(request):
