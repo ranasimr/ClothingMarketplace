@@ -11,10 +11,8 @@ from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 import razorpay
 from django.conf import settings
-from decouple import config
 
-client = razorpay.Client(auth=(config('RAZOR_PAY_KEY_ID'), config('RAZOR_PAY_KEY_SECRET')))
-
+razorpay_client = razorpay.Client(auth=("settings.razor_pay_key_id", "settings.key_secret"))
 
 def payments(request):
     # if request.method == 'POST':
@@ -141,30 +139,18 @@ def place_order(request, total=0, quantity=0):
             data.order_number = order_number
             data.save()
 
+            
+
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-            razorpay_order = client.order.create(data={
-                'amount': int(grand_total * 100),  # Amount in paise
-                'currency': 'INR',
-                'payment_capture': 1  # Auto capture payment
-            })
-            print("Razorpay Order:", razorpay_order)  # Add this line to print Razorpay order
-
-            # Print Razorpay key ID to verify it's correct
-            razorpay_key_id = settings.RAZOR_PAY_KEY_ID
-            print("Razorpay Key ID:", razorpay_key_id)
-
             context = {
                 'order': order,
                 'cart_items': cart_items,
                 'total': total,
                 'tax': tax,
                 'grand_total': grand_total,
-                'razorpay_order': razorpay_order,
-                'razorpay_key_id': razorpay_key_id,
             }
             return render(request, 'orders/payments.html', context)
             
-           
            
     else:
      return redirect('checkout')
@@ -177,14 +163,11 @@ def place_order(request, total=0, quantity=0):
 
     # # Redirect to checkout if the request method is not POST
     # return redirect('checkout')
-
 def order_complete(request):
     order_number = request.GET.get('order_number')
     transID = request.GET.get('payment_id')
 
-    try: 
-
-            
+    try:
          order = Order.objects.get(order_number=order_number, is_ordered=True)
          ordered_products = OrderProduct.objects.filter(order_id=order.id)
 
@@ -205,15 +188,3 @@ def order_complete(request):
          return render(request, 'orders/order_complete.html',context)
     except (Payment.DoesNotExist, Order.DoesNotExist):
          return redirect('home')    
-
-def my_view(request):
-    razorpay_key = settings.RAZOR_PAY_KEY_ID
-    context = {
-        'razorpay_key': razorpay_key,
-        # other context variables
-    }
-    return render(request, 'payments.html', context)    
-
-    
-    
-    
