@@ -17,13 +17,13 @@ def store(request,category_slug=None):
     if category_slug!= None:
         categories= get_object_or_404(Category,slug=category_slug)
         products= Product.objects.filter(category=categories,is_available=True)
-        paginator =Paginator(products,1)
+        paginator =Paginator(products,6)
         page=request.GET.get('page')
         paged_products=paginator.get_page(page)
         product_count = products.count()
     else:        
       products=Product.objects.all().filter(is_available=True).order_by('id')
-      paginator =Paginator(products,3)
+      paginator =Paginator(products,10)
       page=request.GET.get('page')
       paged_products=paginator.get_page(page)
       product_count = products.count()
@@ -77,6 +77,33 @@ def search(request):
            }
      return render(request,'stores/store.html',context)
 
+# def filter_products(request):
+#     category_slug = request.GET.get('category')
+#     sizes = request.GET.getlist('size')
+#     min_price = request.GET.get('min_price')
+#     max_price = request.GET.get('max_price')
+
+#     # Filter products based on selected category
+#     products = Product.objects.filter(is_available=True)
+#     if category_slug:
+#         products = products.filter(category__slug=category_slug)
+
+#     # Filter products based on selected sizes
+#     if sizes:
+#         products = products.filter(size__in=sizes)
+
+#     # Filter products based on selected price range
+#     if min_price and max_price:
+#         products = products.filter(price__range=(min_price, max_price))
+
+#     product_count = products.count()
+
+#     context = {
+#         'products': products,
+#         'product_count': product_count,
+#     }
+
+    # return render(request, 'stores/store.html', context)
 def submit_review(request, product_id):
     url = request.META.get('HTTP_REFERER')
     if request.method == 'POST':
@@ -99,3 +126,6 @@ def submit_review(request, product_id):
                 data.save()
                 messages.success(request, 'Thank you! Your review has been submitted.')
                 return redirect(url)
+            
+
+     
