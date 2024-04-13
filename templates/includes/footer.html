@@ -1,6 +1,12 @@
+{% load static %} 
+
 <!-- ========================= FOOTER ========================= -->
-<footer class="section-footer border-top">
+<!-- footer.html -->
+
+
+ <!-- <footer class="section-footer border-top">
 	<div class="container">
+		
 		<section class="footer-bottom border-top row">
 			<div class="col-md-2">
 				<p class="text-muted"> Trendify.com  </p>
@@ -17,8 +23,164 @@
 				<i class="fab fa-lg fa-cc-mastercard"></i>
 			</div>
 		</section>
-	</div><!-- //container -->
+	</div>//container -->
+<!-- 
+    
+ -->
+<!-- footer.html -->
+<!-- footer.html -->
+<footer class="section-footer border-top">
+    <div class="container">
+        <section class="footer-top row">
+            <div class="col-lg-3 col-md-6 col-sm-12 text-center mb-4">
+                <!-- Your website logo -->
+                <a href="{% url 'home' %}">
+                    <img src="{% static '/images/logo1.jpg' %}" alt="Your Logo">
+                </a>
+            </div>
+            <div class="col-lg-9 col-md-6 col-sm-12">
+                <!-- Headings -->
+                <div class="row mt-3">
+                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                        <h5 class="mb-3">Contact Details</h5>
+                        <p><i class="fas fa-envelope"></i> <a href="mailto:Trendify202@gmail.com" >Trendify202@gmail.com</a></p>
+                         </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                        <h5 class="mb-3">Our Collection</h5>
+                        <p><i class="fas fa-shopping-bag"></i> <a href="{% url 'store' %}" >Men & Women Latest collection</a></p>
+
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                        <h5 class="mb-3">Connect with Us</h5>
+                        <p class="text-center"><a href="#" ><i class="fab fa-lg fa-instagram"></i></a></p>
+                        <p class="text-center"><a href="#" ><i class="fab fa-lg fa-facebook"></i></a></p>
+                        <p class="text-center"><a href="#" ><i class="fab fa-lg fa-twitter"></i></a></p>
+                    </div>
+                    <div class="col-lg-3 col-md-6 col-sm-6 mb-4">
+                        <h5 class="mb-3">Get To Know Us</h5>
+                        <p><a href="{% url 'about_us' %}">About Us</a></p>
+                        <p><a href="{% url 'privacy_policy' %}">Privacy Policy</a></p>
+                        <p><a href="{% url 'terms_conditions' %}">Terms and Conditions</a></p>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section>
+            <div class="col-md-12 text-center">
+                <p>100% Payment Protection</p>
+                <p>
+                    <a href="#" >
+                        <img src="{% static './images/misc/payments.png' %}" height="26">
+                    </a>
+                </p>
+            </div>
+        </section>
+    </div><!-- //container -->
 </footer>
+
+<style>
+    /* Custom CSS for link hover state */
+    a {
+        color: gray; /* Set text color to black */
+        text-decoration: none; /* Remove default underline */
+    }
+
+    a:hover {
+        color: blue; /* Change text color to blue on hover */
+    }
+</style>
+
+
+<style>
+    .mobile-block {
+        display: none;
+    }
+
+    @media (max-width: 1200px) {
+        /* tablet devices */
+    }
+
+    @media (max-width: 992px) {
+        /* small tablet devices */
+        .slider-main .item-slide {
+            height: auto;
+        }
+
+        .table-shopping-cart tr td:first-child {
+            width: 250px;
+        }
+        .table-shopping-cart .itemside .info {
+            padding: 0;
+        }
+        .table-shopping-cart .itemside .aside {
+            display: none;
+        }
+    }
+
+    @media all and (max-width: 768px) {
+        /* mobile devices */
+        .mobile-block {
+            display: block;
+        }
+
+        .mobile-hide {
+            display: none;
+        }
+
+        .section-header .logo {
+            max-height: 40px;
+            width: auto;
+        }
+        .section-header .header-main .brand-wrap {
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .section-header .header-main .search {
+            margin-bottom: 1rem;
+        }
+
+        .item-feature {
+            margin-bottom: 20px;
+        }
+
+        .mobile-order-first {
+            order: -1;
+        }
+
+        .mobile-order-1 {
+            order: 1;
+        }
+
+        .mobile-order-2 {
+            order: 2;
+        }
+
+        .mobile-order-3 {
+            order: 3;
+        }
+
+        .mobile-py {
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .mobile-pb {
+            padding-bottom: 20px;
+        }
+
+        .mobile-pt {
+            padding-top: 20px;
+        }
+
+        .navbar-expand .navbar-collapse {
+            flex-direction: column;
+        }
+    }
+</style>
+
+
+
 <!-- ========================= FOOTER END // ========================= -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>

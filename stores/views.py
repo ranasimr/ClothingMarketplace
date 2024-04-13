@@ -128,4 +128,12 @@ def submit_review(request, product_id):
                 return redirect(url)
             
 
-     
+
+def about_us(request):
+    return render(request, 'stores/about_us.html')
+
+def privacy_policy(request):
+    return render(request, 'stores/privacy.html')
+
+def terms_conditions(request):
+    return render(request, 'stores/terms_conditions.html')

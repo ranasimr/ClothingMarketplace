@@ -24,7 +24,9 @@
 </header><!-- sect-heading -->
 
 <div class="row">
-	{% for product in products %}
+    {% for product in products|slice:":12"%}
+	
+    
 	<div class="col-md-3">
 		<div class="card card-product-grid">
 			<a href ="{% url 'product_details' product.category.slug product.slug %}" class="img-wrap"> <img src="{{product.images.url}}"> </a>
@@ -45,7 +47,7 @@
 			</figcaption>
 		</div>
 	</div> <!-- col.// -->
-	
+   
  {% endfor %}
 </div> <!-- row.// -->
 
