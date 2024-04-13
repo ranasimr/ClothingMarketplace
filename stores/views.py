@@ -99,3 +99,14 @@ def submit_review(request, product_id):
                 data.save()
                 messages.success(request, 'Thank you! Your review has been submitted.')
                 return redirect(url)
+            
+
+
+def about_us(request):
+    return render(request, 'stores/about_us.html')
+
+def privacy_policy(request):
+    return render(request, 'stores/privacy_policy.html')
+
+def terms_conditions(request):
+    return render(request, 'stores/terms_conditions.html')

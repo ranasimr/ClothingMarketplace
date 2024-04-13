@@ -13,3 +13,4 @@ def homepage(request):
         'reviews':reviews,
     }
     return render(request,"home.html",context)
+
