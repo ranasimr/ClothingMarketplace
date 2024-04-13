@@ -66,9 +66,16 @@ class AcoountAdmin(UserAdmin):
     list_filter =()
     fieldsets=()
     actions =[download_pdf]
+from django.templatetags.static import static
+
 class UserProfileAdmin(admin.ModelAdmin):
-    def thumbnail(self, object):
-        return format_html('<img src="{}" width="30" style="border-radius:50%;">'.format(object.profile_picture.url))
+    def thumbnail(self, obj):
+        if obj.profile_picture:  # Check if profile_picture exists
+            return format_html('<img src="{}" width="30" style="border-radius:50%;">'.format(obj.profile_picture.url))
+        else:
+            default_image_url = static('images/dp.jpg')
+            return format_html('<img src="{}" width="30" style="border-radius:50%;">'.format(default_image_url))
+
     thumbnail.short_description = 'Profile Picture'
     list_display = ('thumbnail', 'user', 'city', 'state', 'country')
     actions =[download_pdf]
