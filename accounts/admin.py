@@ -17,9 +17,16 @@ def download_pdf(self,request,queryset):
     response['Content-Disposition'] = f'attachment; filename={model_name}.pdf'
     pdf =canvas.Canvas(response, pagesize=letter)
     pdf.setTitle('PDF Report')
-    ordered_queryset = queryset.filter(is_superadmin=False).order_by('id')
-    excluded_fields = ['password', 'date_joined', 'last_login', 'is_superadmin', 'is_active', 'is_staff', 'is_admin']
-    
+
+    ordered_queryset = queryset.order_by('id')
+    excluded_fields = []
+    if queryset.model == Account:
+        excluded_fields.extend(['password', 'date_joined', 'last_login', 'is_active', 'is_staff', 'is_admin'])
+        queryset = queryset.filter(is_superadmin=False)
+    elif queryset.model == UserProfile:
+        excluded_fields.extend(['date_joined', 'last_login','profile_picture'])
+
+
     headers = [field.verbose_name for field in self.model._meta.fields if field.name not in excluded_fields]
     data =[headers]
 

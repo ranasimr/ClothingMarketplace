@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Count
 from stores.models import  Product,Variation,ReviewRating,ProductGallery
 import admin_thumbnails
 
@@ -22,12 +23,15 @@ def download_pdf(self,request,queryset):
     excluded_fields = ['slug','images','modified_date','created_date']
     
     headers = [field.verbose_name for field in self.model._meta.fields if field.name not in excluded_fields]
+    headers.append('Orders')
     data =[headers]
 
     
 
     for obj in ordered_queryset:
         data_row = [str(getattr(obj,field.name)) for field in self.model._meta.fields if field.name not in excluded_fields]
+        total_orders = obj.orderproduct_set.count()
+        data_row.append(str(total_orders))
         data.append(data_row)
 
     table= Table(data)
@@ -87,10 +91,21 @@ class ProductGalleryInline(admin.TabularInline):
     extra = 1
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_name', 'description', 'price','stock', 'category', 'images', 'created_date', 'modified_date', 'is_available')
+    list_display = ('product_name', 'description', 'price','stock', 'category', 'images', 'created_date', 'modified_date', 'is_available','get_total_orders')
     prepopulated_fields={'slug':('product_name',)}
     inlines = [ProductGalleryInline]
     actions =[download_pdf]
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        queryset = queryset.annotate(total_orders=Count('orderproduct'))
+        return queryset
+
+    def get_total_orders(self, obj):
+        return obj.total_orders
+
+    get_total_orders.short_description = 'Total Orders'
+
 
 # Register your models here.
 class VariationAdmin(admin.ModelAdmin):

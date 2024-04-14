@@ -1,40 +1,44 @@
 from django.contrib import admin
+from django.db.models import Count
 from .models import Category
-
-
-# Register your models here.
+from orders.models import OrderProduct
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 from django.http import HttpResponse
-from .models import *
 
-
-
-def download_pdf(self,request,queryset):
-    model_name =self.model.__name__
+def download_pdf(model_admin, request, queryset):
+    model_name = model_admin.model.__name__
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename={model_name}.pdf'
-    pdf =canvas.Canvas(response, pagesize=letter)
+    pdf = canvas.Canvas(response, pagesize=letter)
     pdf.setTitle('PDF Report')
     ordered_queryset = queryset.order_by('id')
     
-    headers = [field.verbose_name for field in self.model._meta.fields ]
-    data =[headers]
-
     
+    # headers = [field.verbose_name for field in model_admin.model._meta.fields ]
+    # data =[headers]
+
+    headers = ['ID', 'Category Name', 'Description', 'Total Orders']  # Define headers
+    data = [headers]
+
 
     for obj in ordered_queryset:
-        data_row = [str(getattr(obj,field.name)) for field in self.model._meta.fields ]
+        category_id = obj.id
+        category_name = obj.category_name
+        description = obj.description
+        total_orders = OrderProduct.objects.filter(product__category=obj).count()
+        data_row = [str(category_id), category_name, description, str(total_orders)]  # Include data
         data.append(data_row)
+        # data_row = [str(getattr(obj,field.name)) for field in model_admin.model._meta.fields ]
+        # data.append(data_row)
 
-    table= Table(data)
+    table = Table(data)
     table.setStyle(TableStyle(
         [
          ('BACKGROUND', (0, 0), (-1, 0), colors.gray),
-         
          ('GRID', (0, 0), (-1, -1), 1, colors.black)   
         ]
     ))
@@ -56,10 +60,18 @@ def download_pdf(self,request,queryset):
 
     pdf.save()
     return response
+
 download_pdf.short_description = "Download Selected Items as PDF"
 
 class CategoryAdmin(admin.ModelAdmin):
-    prepopulated_fields= {'slug':('category_name',)}
-    list_display =('category_name','slug',)
-    actions =[download_pdf]
-admin.site.register(Category,CategoryAdmin)
+    prepopulated_fields = {'slug': ('category_name',)}
+    list_display = ('category_name', 'slug', 'total_orders')
+    actions = [download_pdf]
+
+    def total_orders(self, obj):
+        # Calculate the total number of orders for this category
+        return OrderProduct.objects.filter(product__category=obj).count()
+
+    total_orders.short_description = 'Total Orders'
+
+admin.site.register(Category, CategoryAdmin)
