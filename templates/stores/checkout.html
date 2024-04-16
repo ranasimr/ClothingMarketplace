@@ -16,6 +16,17 @@
         <h4 class="card-title mb-4">Billing Address</h4>
         <form action="{% url 'place_order' %}" method="POST">
             {% csrf_token %}
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|capfirst }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
             <div class="form-row">
                 <div class="col form-group">
                     <label for="first_name">First Name</label>

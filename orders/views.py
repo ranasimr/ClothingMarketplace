@@ -91,6 +91,9 @@ def place_order(request, total=0, quantity=0,):
     tax = (2 * total)/100
     grand_total = total + tax
 
+
+   
+
     if request.method == 'POST':
         form = OrderForm(request.POST)
         if form.is_valid():
@@ -121,6 +124,10 @@ def place_order(request, total=0, quantity=0,):
             data.order_number = order_number
             data.save()
 
+            # order = form.save(commit=False)
+            # order.user = current_user
+            # order.save()
+
             order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
             context = {
                 'order': order,
@@ -130,9 +137,32 @@ def place_order(request, total=0, quantity=0,):
                 'grand_total': grand_total,
             }
             return render(request, 'orders/payments.html', context)
+        
     else:
-        return redirect('checkout')
-
+        form = OrderForm()
+    context = {
+        'form': form,
+        'cart_items': cart_items,  # Pass cart items to the template as well
+        'total': total,
+        'tax': tax,
+        'grand_total': grand_total,
+        
+    }
+        
+    return render(request, 'stores/checkout.html', context)
+        # return redirect('checkout')
+    #     form = OrderForm()
+    # return render(request, 'checkout.html', {'form': form})
+    
+        
+    #     else:
+    #        return render(request, 'checkout.html', {'form': form})
+    # #     form = OrderForm()
+    # #     return render(request, 'checkout.html', {'form': form})
+    # #  # return redirect('checkout')
+    # else:
+    #     form = OrderForm()
+    #     return render(request, 'checkout.html', {'form': form})
 
 def order_complete(request):
     order_number = request.GET.get('order_number')

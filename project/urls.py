@@ -19,9 +19,22 @@ from django.urls import path,include
 from django.conf import settings
 from django.conf.urls.static import static
 from project import views
+from django.views.generic import RedirectView
+from admin_honeypot import views as honeypot_views
+
+from .views import custom_admin_honeypot_logout, redirect_to_admin_login
+
 
 urlpatterns = [
+    # Other URL patterns...
+    
     path('admin/',include('admin_honeypot.urls',namespace='admin_honeypot')),
+    path('logout/', custom_admin_honeypot_logout, name='custom_admin_honeypot_logout'),
+   path('admin/login/', redirect_to_admin_login, name='admin_honeypot_login_redirect'),
+    # Other URL patterns...
+
+
+
     path('securelogin/', admin.site.urls),
     path('',views.homepage,name='homepage'),
     path('store/',include('stores.urls'),name='store'),

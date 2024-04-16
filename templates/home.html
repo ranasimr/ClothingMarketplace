@@ -133,6 +133,16 @@
 				<a href="{% url 'product_details' product.category.slug product.slug %}" class="title">{{product.product_name}}</a>
 				<div class="price mt-1">
           ₹{{product.price}}
+          {% comment %} <div class="price">
+            <span class="current-price">₹{{product.price}}</span>
+           
+            <span class="original-price">₹{{ discounted_price }}</span>
+            <span class="discount">(30% OFF)
+            </span>
+          
+          </div> {% endcomment %}
+          
+        
           
         </div> <!-- price-wrap.// -->
 				<div class="rating-star">
@@ -235,7 +245,37 @@
 }
 
 
+.price{
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 15px;
+  color:#282c3f;
+  white-space: nowrap;
+ 
+}
+.current-price{
+  font-size: 14px;
+  font-weight: 700;
+  color: #282c3f;
+}
+.original-price{
+  text-decoration: line-through;
+  color: #7e818c;
+  font-weight: 400;
+  margin-left: 5px;
+  font-size: 12px;
+
+}
+.discount{
+  color: #ff905a;
+  font-weight: 400;
+  font-size: 12px;
+  margin-left: 5px
+}
+
 
 </style>
+
+
 
 {% endblock %}

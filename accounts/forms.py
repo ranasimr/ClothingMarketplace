@@ -30,15 +30,47 @@ class RegistrationForm(forms.ModelForm):
             self.fields[field].widget.attrs['class']='form-control'
 
 
-    def clean(self):
-        cleaned_data= super(RegistrationForm,self).clean()
-        password= cleaned_data.get('password')
-        confirm_password= cleaned_data.get('confirm_password')
+    # def clean(self):
+    #     cleaned_data= super(RegistrationForm,self).clean()
+    #     password= cleaned_data.get('password')
+    #     confirm_password= cleaned_data.get('confirm_password')
 
-        if password != confirm_password:
-             raise forms.ValidationError(
-                 "Password does not match!"
-             )
+    #     if password != confirm_password:
+    #          raise forms.ValidationError(
+    #              "Password does not match!"
+    #          )
+    def clean(self):
+        cleaned_data = super().clean()
+
+        print("Clean method called")
+        print("Password:", cleaned_data.get('password'))
+        print("Confirm Password:", cleaned_data.get('confirm_password'))
+        print("Phone Number:", cleaned_data.get('phone_number'))
+        print("First Name:", cleaned_data.get('first_name'))
+        print("Last Name:", cleaned_data.get('last_name'))
+
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+        phone_number = cleaned_data.get('phone_number')
+        first_name = cleaned_data.get('first_name')
+        last_name = cleaned_data.get('last_name')
+
+        if password and confirm_password and password != confirm_password:
+          raise forms.ValidationError("Password does not match!")
+
+        # if phone_number and not phone_number.isdigit():
+        #   raise forms.ValidationError("Phone number must contain only digits.")
+        if phone_number:
+           if not phone_number.isdigit():
+              raise forms.ValidationError("Phone number must contain only digits.")
+           elif len(phone_number) != 10:
+              raise forms.ValidationError("Phone number must be exactly 10 digits long.")
+
+        if first_name and not first_name.replace(" ", "").isalpha():  # Handle spaces
+          raise forms.ValidationError( "First name must contain only alphabetic characters.")
+
+        if last_name and not last_name.replace(" ", "").isalpha():  # Handle spaces
+          raise forms.ValidationError( "Last name must contain only alphabetic characters.")
         
 
 

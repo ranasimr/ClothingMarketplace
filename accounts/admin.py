@@ -8,6 +8,8 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
 from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
+from django.templatetags.static import static
+
 
 
 
@@ -21,7 +23,7 @@ def download_pdf(self,request,queryset):
     ordered_queryset = queryset.order_by('id')
     excluded_fields = []
     if queryset.model == Account:
-        excluded_fields.extend(['password', 'date_joined', 'last_login', 'is_active', 'is_staff', 'is_admin'])
+        excluded_fields.extend(['password', 'date_joined', 'last_login', 'is_active', 'is_staff', 'is_admin','is_superadmin'])
         queryset = queryset.filter(is_superadmin=False)
     elif queryset.model == UserProfile:
         excluded_fields.extend(['date_joined', 'last_login','profile_picture'])
@@ -72,8 +74,13 @@ class AcoountAdmin(UserAdmin):
     filter_horizontal = ()
     list_filter =()
     fieldsets=()
+
+    def get_queryset(self, request):
+        # Override the queryset method to filter out superadmin users
+        queryset = super().get_queryset(request)
+        return queryset.filter(is_superadmin=False)
+    
     actions =[download_pdf]
-from django.templatetags.static import static
 
 class UserProfileAdmin(admin.ModelAdmin):
     def thumbnail(self, obj):
