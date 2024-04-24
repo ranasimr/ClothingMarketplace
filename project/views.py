@@ -15,6 +15,8 @@ def custom_admin_honeypot_logout(request):
     auth.logout(request)
     # Redirect to the admin login page
     return redirect(reverse('admin:login'))
+
+
 def homepage(request):
    
     products=Product.objects.all().filter(is_available=True).order_by('created_date')

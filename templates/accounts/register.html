@@ -12,6 +12,17 @@
             <header class="mb-4"><h4 class="card-title">Sign up</h4></header>
             <form action ="{%  url 'register' %}" method="POST">
                  {% csrf_token %}
+                 {% comment %} {% if form.errors %}
+                <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <li>{{ field|capfirst }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+                 </div>
+                {% endif %} {% endcomment %}
                  
 
                     <div class="form-row">
@@ -48,17 +59,18 @@
                     <div class="form-group">
                         <button type="submit" class="btn btn-primary btn-block"> Register here </button>
                     </div> <!-- form-group// --> 
-                 {{form.email.errors}}  
-                 {{form.non_field_errors}}      
-                {% comment %} {{form.emial.errors}}   
-                {{form.non_fields_errors}}    {% endcomment %}
+                
+                  {{form.email.errors}}  
+                  {{form.non_field_errors}} 
+                   
+                
+                
                 </form>
             </article><!-- card-body.// -->
         </div> <!-- card .// -->
         <p class="text-center mt-4">Have an account?already <a href="{% url 'login' %}">Log In</a></p>
         <br><br>
-    <!-- ============================ COMPONENT REGISTER  END.// ================================= -->
-    
+
     
     </section>
     <!-- ========================= SECTION CONTENT END// ========================= -->

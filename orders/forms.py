@@ -1,7 +1,6 @@
 from django import forms
 from .models import Order
 
-
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -27,21 +26,22 @@ class OrderForm(forms.ModelForm):
         if last_name and not last_name.replace(" ", "").isalpha():
             raise forms.ValidationError("Last name must contain only alphabetic characters.")
         return last_name
+    
     def clean_address_line_1(self):
         address_line_1 = self.cleaned_data.get('address_line_1')
-        if address_line_1 and len(address_line_1.split()) > 20:
-            raise forms.ValidationError("Address line 1 can only contain up to 20 words.")
+        if address_line_1 and len(address_line_1.split()) > 50:
+            raise forms.ValidationError("Address line 1 can only contain up to 50 words.")
         # Add validation for alphanumeric characters and specific symbols here
-        if address_line_1 and not all(char.isalnum() or char in '/\\,#' for char in address_line_1):
+        if address_line_1 and not all(char.isalnum() or char in ' /\\,#' for char in address_line_1):
             raise forms.ValidationError("Address line 1 can only contain alphanumeric characters and /\\,# symbols.")
         return address_line_1
 
     def clean_address_line_2(self):
         address_line_2 = self.cleaned_data.get('address_line_2')
-        if address_line_2 and len(address_line_2.split()) > 20:
-            raise forms.ValidationError("Address line 2 can only contain up to 20 words.")
+        if address_line_2 and len(address_line_2.split()) > 50:
+            raise forms.ValidationError("Address line 2 can only contain up to 50 words.")
         # Add validation for alphanumeric characters and specific symbols here
-        if address_line_2 and not all(char.isalnum() or char in '/\\,#' for char in address_line_2):
+        if address_line_2 and not all(char.isalnum() or char in ' /\\,#' for char in address_line_2):
             raise forms.ValidationError("Address line 2 can only contain alphanumeric characters and /\\,# symbols.")
         return address_line_2
 
@@ -62,3 +62,12 @@ class OrderForm(forms.ModelForm):
         if city and not city.isalpha():
             raise forms.ValidationError("City must contain only alphabetic characters.")
         return city
+
+    def __init__(self, *args, **kwargs):
+        super(OrderForm, self).__init__(*args, **kwargs)
+        self.fields['first_name'].widget.attrs['placeholder'] = 'Enter First Name'
+        self.fields['last_name'].widget.attrs['placeholder'] = 'Enter Last Name'
+        self.fields['phone'].widget.attrs['placeholder'] = 'Enter Phone Number'
+        self.fields['email'].widget.attrs['placeholder'] = 'Enter Email Address'
+        for field in self.fields:
+            self.fields[field].widget.attrs['class'] = 'form-control'

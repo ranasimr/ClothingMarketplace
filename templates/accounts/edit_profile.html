@@ -20,13 +20,15 @@
 
                                {% else %}
                                 <!-- Placeholder or default image -->
-                                <img src="{% static 'images/bydefult.jpg' %}" alt="Default Profile Picture" width="100" style="border-radius: 50px;">
+                                <img src="{% static 'images/dp.jpg' %}" alt="Default Profile Picture" width="100" style="border-radius: 50px;">
                             {% endif %}
                         </div>
                         <div class="row">
                             <div class="col-md-12">
                                 <form action="{% url 'edit_profile' %}" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
+                                    
+                                    
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
                                             <label>First Name</label>
@@ -47,7 +49,8 @@
                                             {{ profile_form.profile_picture }}
                                         </div>
                                     </div>
-                                    <div class="form-group">
+                                    
+                                     <div class="form-group">
                                         <label>Address Line 1</label>
                                         {{ profile_form.address_line_1 }}
                                     </div>
@@ -67,7 +70,7 @@
                                         <div class="form-group col-md-4">
                                             <label>Country</label>
                                             {{ profile_form.country }}
-                                        </div>
+                                        </div> 
                                     </div>
                                     <input type="submit" value="Save" class="btn btn-primary">
                                 </form>

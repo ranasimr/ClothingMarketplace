@@ -1,7 +1,10 @@
 
 
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager,PermissionsMixin
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import gettext_lazy as _
 
 
 class MyAccountManager(BaseUserManager):
@@ -71,6 +74,8 @@ class Account(AbstractBaseUser):
     
 class UserProfile(models.Model):
         user = models.OneToOneField(Account, on_delete=models.CASCADE)
+        phone_number = models.CharField(max_length=50)
+
         address_line_1 = models.CharField(blank=True, max_length=100)
         address_line_2 = models.CharField(blank=True, max_length=100)
         profile_picture = models.ImageField(blank=True, upload_to='userprofile')
@@ -78,7 +83,43 @@ class UserProfile(models.Model):
         state = models.CharField(blank=True, max_length=20)
         country = models.CharField(blank=True, max_length=20)
 
-def __str__(self):
+        
+
+def  __str__(self):
         return self.user.first_name
 def full_address(self):
-        return f'{self.address_line_1} {self.address_line_2}' 
+        return f'{self.address_line_1} {self.address_line_2}'
+
+
+       
+
+
+
+
+
+
+
+
+class Address(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    address_line_1 = models.CharField(blank=True, max_length=100)
+    address_line_2 = models.CharField(blank=True, max_length=100)
+    city = models.CharField(blank=True, max_length=50)
+    state = models.CharField(blank=True, max_length=50)
+    country = models.CharField(blank=True, max_length=50)
+
+
+    
+
+
+    def __str__(self):
+        return f"Address for {self.user.first_name}"
+
+    def full_address(self):
+        return f"{self.address_line_1}, {self.address_line_2}, {self.city}, {self.state}, {self.country}"
+    
+
+    # class Meta:
+        
+    #     permissions = [('delete_own_address', 'Can delete own address')]
+       

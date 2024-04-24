@@ -65,17 +65,37 @@ def product_details(request,category_slug,product_slug):
     return render(request,'stores/product_details.html',context)
    
 
+
 def search(request):
-     if 'keyword' in request.GET:
-         keyword = request.GET['keyword']
-         if keyword:
-           products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
-           product_count = products.count()
-         context ={
-            'products': products,
-             'product_count':product_count,
-           }
-     return render(request,'stores/store.html',context)
+    keyword = request.GET.get('keyword', '').strip()
+    
+    if not keyword:  # If search bar is empty
+        return render(request, 'stores/store.html', {'products': [], 'product_count': 0})
+    
+    products = Product.objects.order_by('-created_date').filter(
+        Q(description__icontains=keyword) | Q(product_name__icontains=keyword)
+    )
+    product_count = products.count()
+    
+    context = {
+        'products': products,
+        'product_count': product_count,
+    }
+    
+    return render(request, 'stores/store.html', context)
+# def search(request):
+#     products = []  # Initialize products as an empty list
+#     product_count = 0  # Initialize product_count as 0
+#     if 'keyword' in request.GET:
+#          keyword = request.GET['keyword']
+#          if keyword:
+#            products = Product.objects.order_by('-created_date').filter(Q(description__icontains=keyword) | Q(product_name__icontains=keyword))
+#            product_count = products.count()
+#          context ={
+#             'products': products,
+#              'product_count':product_count,
+#            }
+#     return render(request,'stores/store.html',context)
 
 # def filter_products(request):
 #     category_slug = request.GET.get('category')

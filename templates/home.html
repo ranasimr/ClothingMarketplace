@@ -25,11 +25,17 @@
                 </div>
               <div class="caption">
                   <p>Latest collections</p>
-              <h1><h2>New Arrivals</h2><span id="span2">30%</span>Off </h1>
+              <h1><h2>New Arrivals</h2><span id="span2"></span></h1>
               </div>
+              
               <div class="text-left">
                   <div class="col-md-4 offset-md-2">
-                      <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p>
+                      <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p> -->
+                      {% for category in links %}
+                        {% if category.category_name == "Women ethnic" %}
+                          <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
+                        {% endif %}
+                      {% endfor %}
                   </div>
               </div>
               
@@ -49,7 +55,12 @@
              
               <div class="text-left">
                   <div class="col-md-4 offset-md-2">
-                    <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p>
+                    <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p> -->
+                  {% for category in links %}
+                    {% if category.category_name == "Women Western" %}
+                      <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
+                    {% endif %}
+                  {% endfor %}
                   </div>
               </div>
               
@@ -67,7 +78,7 @@
                   
                 <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p> -->
                 {% for category in links %}
-                {% if category.category_name == "Shirts" %}
+                {% if category.category_name == "Men" %}
                     <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
                 {% endif %}
                 {% endfor %}
@@ -87,8 +98,13 @@
               
               <div class="text-left">
                  
-                <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p>
-                  
+                <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p>
+                   -->
+                {% for category in links %}
+                {% if category.category_name == "tshirts" %}
+                    <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
+                {% endif %}
+                {% endfor %}
               </div>
               
               
@@ -123,7 +139,7 @@
 </header><!-- sect-heading -->
 
 <div class="row">
-    {% for product in products|slice:":12"%}
+    {% for product in products|slice:":20"%}
 	
     
 	<div class="col-md-3">

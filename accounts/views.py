@@ -3,14 +3,14 @@ from .forms import RegistrationForm ,UserForm,UserProfileForm
 from .models import  Account,UserProfile
 from orders.models import Order,OrderProduct
 from django.contrib import messages, auth    
-from django.contrib.auth.decorators import  login_required   
+from django.contrib.auth.decorators import  login_required  
+from django.utils.decorators import method_decorator 
 from django.urls import reverse 
 from django.http import HttpResponseRedirect 
 from stores.models import Product
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
-
-
+from django.contrib.auth import update_session_auth_hash
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import render_to_string
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
@@ -23,6 +23,14 @@ from django.contrib import messages
 from carts.views import _cart_id
 from carts.models import Cart,CartItem
 import requests
+
+from .forms import AddressForm
+from .models import Address
+from django.views.generic import View
+
+from django.contrib.auth.models import User, Group
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Permission
 
 
 
@@ -38,6 +46,7 @@ def homepage(request):
     
     # Add any logic here for the home page
      return render(request, 'home.html',context)
+
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -131,6 +140,15 @@ def login(request):
             auth.login(request,user)
             messages.success(request,"You are now logged in")
             url =request.META.get('HTTP_REFERER')
+
+
+            # Check if the user has a profile
+            try:
+                user_profile = UserProfile.objects.get(user=user)
+                if not user_profile.address_line_1:
+                    messages.info(request, "Please complete your profile by adding an address.")
+            except UserProfile.DoesNotExist:
+                messages.info(request, "Please complete your profile by adding an address.")
             
             try:
                 query= requests.utils.urlparse(url).query
@@ -143,6 +161,7 @@ def login(request):
                 
             except:
                 return redirect('dashboard')
+                # return redirect('home')
         else:
             messages.error(request,'Invalid login credentials')
             return redirect('login')
@@ -264,6 +283,7 @@ def edit_profile(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+       
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -285,7 +305,94 @@ def edit_profile(request):
         'profile_picture_url': profile_picture_url,  # Pass profile picture URL to the template
     }
     return render(request, 'accounts/edit_profile.html', context)
- 
+
+
+# @login_required(login_url='login')
+# def edit_profile(request):
+#     userprofile = get_object_or_404(UserProfile, user=request.user)
+#     print(userprofile.profile_picture)
+#     if request.method == 'POST':
+#         user_form = UserForm(request.POST, instance=request.user)
+#         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+#         if user_form.is_valid() and profile_form.is_valid():
+#             user_form.save()
+#             profile_form.save()
+
+#             # Save additional address fields if present
+#             for i in range(3):  # Assuming you allow up to 3 additional addresses
+#                 address_field_name = f'address_line_{i + 3}'  # Start from 3 as first additional address
+#                 if address_field_name in request.POST:
+#                     setattr(userprofile, address_field_name, request.POST[address_field_name])
+#             userprofile.save()
+
+#             messages.success(request, 'Your profile has been updated.')
+#             return redirect('edit_profile')
+#     else:
+#         user_form = UserForm(instance=request.user)
+#         profile_form = UserProfileForm(instance=userprofile)
+    
+#     profile_picture_url = None
+#     if userprofile.profile_picture:
+#         profile_picture_url = userprofile.profile_picture.url
+
+    
+#     context = {
+#         'user_form': user_form,
+#         'profile_form': profile_form,
+#         'userprofile': userprofile,
+#         'profile_picture_url': profile_picture_url,
+#     }
+#     return render(request, 'accounts/edit_profile.html', context)
+
+# @login_required(login_url='login')
+# def edit_profile(request):
+
+#     userprofile = get_object_or_404(UserProfile, user=request.user)
+#     print(userprofile.profile_picture)
+    
+#     if request.method == 'POST':
+#         user_form = UserForm(request.POST, instance=request.user)
+#         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+
+#         if 'action' in request.POST and request.POST['action'] == 'add_address':
+#             # Add logic to handle adding additional address fields here
+#             pass
+#         else:
+#             # Process user profile form if the form is valid
+#             if user_form.is_valid() and profile_form.is_valid():
+#                 user_form.save()
+#                 profile_form.save()
+                
+#                 # Save additional address fields if present
+#                 for i in range(5):
+#                     address_field_name = f'address_line_{i + 1}'
+#                     if address_field_name in request.POST:
+#                         setattr(userprofile, address_field_name, request.POST[address_field_name])
+#                 userprofile.save()
+
+#                 messages.success(request, 'Your profile has been updated.')
+#                 return redirect('edit_profile')
+
+#     else:
+#         user_form = UserForm(instance=request.user)
+#         profile_form = UserProfileForm(instance=userprofile)
+    
+#     profile_picture_url = None
+#     if userprofile.profile_picture:
+#         profile_picture_url = userprofile.profile_picture.url
+
+#     additional_address_fields = []  # Initialize additional address fields
+    
+#     context = {
+#         'user_form': user_form,
+#         'profile_form': profile_form,
+#         'userprofile': userprofile,
+#         'profile_picture_url': profile_picture_url,
+#         'additional_address_fields': additional_address_fields,
+#     }
+#     return render(request, 'accounts/edit_profile.html', context)
+
+
 @login_required(login_url='login')
 def change_password(request):
     if request.method == 'POST':
@@ -293,35 +400,242 @@ def change_password(request):
         new_password = request.POST['new_password']
         confirm_password = request.POST['confirm_password']
 
-        user = Account.objects.get(username__exact=request.user.username)
+        user = request.user
+
+        # Check if the new password meets complexity requirements
+        if not is_valid_password(new_password):
+            messages.error(request, 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.')
+            return redirect('change_password')
 
         if new_password == confirm_password:
-            success = user.check_password(current_password)
-            if success:
+            # Check if the current password is correct
+            if user.check_password(current_password):
                 user.set_password(new_password)
                 user.save()
-                # auth.logout(request) by default logout in django
+                # Update the user's session authentication hash to prevent them from being logged out
+                update_session_auth_hash(request, user)
                 messages.success(request, 'Password updated successfully.')
                 return redirect('change_password')
             else:
-                messages.error(request, 'Please enter valid current password')
+                messages.error(request, 'Please enter the correct current password.')
                 return redirect('change_password')
         else:
-            messages.error(request, 'Password does not match!')
+            messages.error(request, 'Passwords do not match.')
             return redirect('change_password')
     return render(request, 'accounts/change_password.html')
 
+def is_valid_password(password):
+    # Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character
+    if len(password) < 8:
+        return False
+    has_uppercase = any(char.isupper() for char in password)
+    has_lowercase = any(char.islower() for char in password)
+    has_digit = any(char.isdigit() for char in password)
+    has_special = any(char in '@#$%^&!*?|' for char in password)
+    return has_uppercase and has_lowercase and has_digit and has_special
+# def change_password(request):
+#     if request.method == 'POST':
+#         current_password = request.POST['current_password']
+#         new_password = request.POST['new_password']
+#         confirm_password = request.POST['confirm_password']
+
+#         user = Account.objects.get(username__exact=request.user.username)
+
+#         if new_password == confirm_password:
+#             success = user.check_password(current_password)
+#             if success:
+#                 user.set_password(new_password)
+#                 user.save()
+#                 # auth.logout(request) by default logout in django
+#                 messages.success(request, 'Password updated successfully.')
+#                 return redirect('change_password')
+#             else:
+#                 messages.error(request, 'Please enter valid current password')
+#                 return redirect('change_password')
+#         else:
+#             messages.error(request, 'Password does not match!')
+#             return redirect('change_password')
+#     return render(request, 'accounts/change_password.html')
+
+
+
+
+
 @login_required(login_url='login')
 def order_detail(request, order_id):
-    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
-    order = Order.objects.get(order_number=order_id)
-    subtotal = 0
-    for i in order_detail:
-        subtotal += i.product_price * i.quantity
+    order = get_object_or_404(Order, order_number=order_id)
+    order_detail = order.orderproduct_set.all()
+    subtotal = sum(item.product_price * item.quantity for item in order_detail)
+
+    # Check if the current user has purchased each product in the order
+    has_purchased_products = all(OrderProduct.objects.filter(product=item.product, order=order, order__user=request.user).exists() for item in order_detail)
 
     context = {
         'order_detail': order_detail,
         'order': order,
         'subtotal': subtotal,
+        'has_purchased_products': has_purchased_products,  # Pass the information to the template
     }
     return render(request, 'accounts/order_detail.html', context)
+
+# @login_required(login_url='login')
+# def order_detail(request, order_id):
+#     order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+#     order = Order.objects.get(order_number=order_id)
+#     subtotal = 0
+#     for i in order_detail:
+#         subtotal += i.product_price * i.quantity
+
+#     context = {
+#         'order_detail': order_detail,
+#         'order': order,
+#         'subtotal': subtotal,
+#     }
+#     return render(request, 'accounts/order_detail.html', context)
+
+
+
+
+# @login_required(login_url='login')
+# def add_address(request):
+#     if request.method == 'POST':
+#         form = AddressForm(request.POST)
+#         if form.is_valid():
+#             # Save the address to the database
+#             address = form.save(commit=False)
+#             address.user = request.user  # Assuming you have user authentication enabled
+#             address.save()
+#             # Optionally, you can add a success message
+#             messages.success(request, 'Address added successfully.')
+#             # Redirect the user to a different page or reload the same page
+#             return redirect('add_address')  # Redirect to the same page to clear the form
+        
+#         #  # Check if the delete parameter is present in the POST request
+#         # elif 'delete_address_id' in request.POST:
+#         #     address_id = request.POST.get('delete_address_id')
+#         #     address = get_object_or_404(Address, pk=address_id, user=request.user)
+#         #     address.delete()
+#         #     # Optionally, you can add a success message for deletion
+#         #     messages.success(request, 'Address deleted successfully.')
+#         #     return redirect('add_address')  # Redirect to the same page after deletion
+
+#     else:
+#         form = AddressForm()
+    
+#     # Retrieve and pass saved addresses to the template context
+#     saved_addresses = Address.objects.filter(user=request.user)  # Assuming you have a ForeignKey relationship to the user model
+
+#     # if request.method == 'POST' and 'delete_address_id' in request.POST:
+#     #     address_id = request.POST.get('delete_address_id')
+#     #     address = get_object_or_404(Address, pk=address_id, user=request.user)
+#     #     address.delete()
+#     #     # Optionally, you can add a success message for deletion
+#     #     messages.success(request, 'Address deleted successfully.')
+#     #     return redirect('add_address')  # Redirect to the same page after deletion
+    
+
+#     return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses})
+
+
+# @login_required(login_url='login')
+# def delete_address(request, address_id):
+#     address = get_object_or_404(Address, pk=address_id)
+#     if address.user == request.user:
+#         address.delete()
+#         return JsonResponse({'message': 'Address deleted successfully.'})
+#     else:
+#         return JsonResponse({'error': 'You are not authorized to delete this address.'}, status=403)
+
+# @login_required(login_url='login')
+# def add_address(request):
+#     if request.method == 'POST':
+#         address_form = AddressForm(request.POST)
+#         if address_form.is_valid():
+#             address = address_form.save(commit=False)
+#             address.user = request.user  # Assuming you have authentication enabled
+#             address.save()
+#             return redirect('dashboard')  # Redirect to dashboard or any other page after adding the address
+#     else:
+#         address_form = AddressForm()
+#     return render(request, 'accounts/add_address.html', {'address_form': address_form})
+
+
+
+
+# class AddAddressView(View):
+#     def get(self, request):
+#         form = AddressForm()
+#         saved_addresses = Address.objects.filter(user=request.user)
+
+#         # Check if the user has a profile and if the profile address is available
+#         try:
+#             user_profile = UserProfile.objects.get(user=request.user)
+#             profile_address = {
+#                 'address_line_1': user_profile.address_line_1,
+#                 'address_line_2': user_profile.address_line_2,
+#                 'city': user_profile.city,
+#                 'state': user_profile.state,
+#                 'country': user_profile.country
+#             }
+#             if all(profile_address.values()):
+#                 # Prepopulate the AddressForm with the profile address
+#                 form = AddressForm(initial=profile_address)
+#         except UserProfile.DoesNotExist:
+#             pass
+
+#         return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses})
+
+#     def post(self, request):
+#         form = AddressForm(request.POST)
+#         if form.is_valid():
+#             address = form.save(commit=False)
+#             address.user = request.user
+#             address.save()
+#             messages.success(request, 'Address added successfully.')
+#             return redirect('add_address')
+#         else:
+#             saved_addresses = Address.objects.filter(user=request.user)
+#             return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses})
+
+
+
+
+
+
+
+class AddAddressView(View):
+    def get(self, request):
+        form = AddressForm()
+        saved_addresses = Address.objects.filter(user=request.user)
+        return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses})
+    
+    def post(self, request):
+        form = AddressForm(request.POST)
+        if form.is_valid():
+            address = form.save(commit=False)
+            address.user = request.user
+            address.save()
+            messages.success(request, 'Address added successfully.')
+            return redirect('add_address')
+        else:
+            saved_addresses = Address.objects.filter(user=request.user)
+            return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses})
+        
+
+
+
+@login_required(login_url='login')
+def delete_address(request, address_id):
+    # Get the address object
+    address = get_object_or_404(Address, pk=address_id)
+
+    # Check if the user is authorized to delete the address
+    if address.user == request.user:
+        # Delete the address
+        address.delete()
+        messages.success(request, 'Address deleted successfully.')
+    else:
+         # Display error message if the user is not authorized
+        messages.error(request, 'You are not authorized to delete this address.')
+
+    return redirect('add_address')

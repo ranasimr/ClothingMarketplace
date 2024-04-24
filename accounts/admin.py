@@ -10,7 +10,7 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 from django.templatetags.static import static
 
-
+from .models import Address
 
 
 def download_pdf(self,request,queryset):
@@ -94,8 +94,15 @@ class UserProfileAdmin(admin.ModelAdmin):
     list_display = ('thumbnail', 'user', 'city', 'state', 'country')
     actions =[download_pdf]
 
+
+
+
+
+
+
+
 admin.site.register(Account, AcoountAdmin)
 admin.site.register(UserProfile, UserProfileAdmin)
 
-
+admin.site.register(Address)
 
