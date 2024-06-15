@@ -44,8 +44,6 @@
                                 <input type="tel" id="phone" name="phone" class="form-control"  value="{{ user.phone_number }}" required>
                             </div>
                         </div>
-                        <!-- Choose Address Button -->
-                        <button type="button" class="btn btn-secondary choose-address" data-toggle="modal" data-target="#chooseAddressModal">Choose Address</button>
                         <!-- Modal -->
                         <div class="modal fade" id="chooseAddressModal" tabindex="-1" role="dialog" aria-labelledby="chooseAddressModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -57,17 +55,25 @@
                                         </button>
                                     </div>
                                     <div class="modal-body">
+                                        
+                                        
                                         <div id="choose-address-options">
-                                            {% for address in saved_addresses %}
+                                            {% if saved_addresses %}
+                                               {% for address in saved_addresses %}
                                                 <div class="form-check">
                                                     <input class="form-check-input choose-address-option" type="radio" name="selected_address" id="address{{ address.id }}" value="{{ address.id }}">
                                                     <label class="form-check-label" for="address{{ address.id }}">
                                                         {{ address.full_address }}
                                                     </label>
                                                 </div>
-                                            {% endfor %}
+                                               {% endfor %}
+                                            {% else %}
+                                            <p>You haven't saved any addresses yet in Saved Address Section.</p>
+                                        {% endif %}
                                         </div>
-                                        <button type="button" class="btn btn-primary" id="choose-address-btn">Choose Address</button>
+                                        {% if saved_addresses %}
+                                         <button type="button" class="btn btn-primary" id="choose-address-btn">Choose Address</button>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>
@@ -77,31 +83,33 @@
                         <div class="form-row">
                             <div class="col form-group">
                                 <label for="address_line_1">Address line 1</label>
-                                <input type="text" id="address_line_1" name="address_line_1" class="form-control" required>
+                                <input type="text" id="address_line_1" name="address_line_1" value="{{ user.userprofile.address_line_1 }}" class="form-control" required>
                             </div>
                             <div class="col form-group">
                                 <label for="address_line_2">Address line 2</label>
-                                <input type="text" id="address_line_2" name="address_line_2" class="form-control">
+                                <input type="text" id="address_line_2" name="address_line_2" value="{{ user.userprofile.address_line_2 }}" class="form-control">
                             </div>
                         </div>
                         <div class="form-row">
                             <div class="col form-group" style="margin-right: 5px;">
                                 <label for="city">City</label>
-                                <input type="text" id="city" name="city" class="form-control" required>
+                                <input type="text" id="city" name="city" value="{{ user.userprofile.city }}" class="form-control" required>
                             </div>
                             <div class="col form-group" style="margin-right: 5px;">
                                 <label for="state">State</label>
-                                <input type="text" id="state" name="state" class="form-control" required>
+                                <input type="text" id="state" name="state" value="{{ user.userprofile.state }}" class="form-control" required>
                             </div>
                             <div class="col form-group">
                                 <label for="country">Country</label>
-                                <input type="text" id="country" name="country" class="form-control" required>
+                                <input type="text" id="country" name="country"  value="{{ user.userprofile.country }}" class="form-control" required>
                             </div>
                         </div>
-                        <div class="form-row">
+                        {% comment %} <div class="form-row">
                             <label for="order_note">Order Note</label>
                             <textarea id="order_note" name="order_note" rows="2" class="form-control"></textarea>
-                        </div> 
+                        </div>  {% endcomment %}
+                        <!-- Choose Address Button -->
+                        <button type="button" class="btn btn-primary choose-address" data-toggle="modal" data-target="#chooseAddressModal">Choose Another Address</button>
                         
                     </div>
             </div> <!-- card.// -->
@@ -174,45 +182,6 @@
 
 
 <script>
-//    document.getElementById('choose-address-btn').addEventListener('click', function() {
-//        var selectedAddressId = document.querySelector('input[name="selected_address"]:checked').value;
-//        var selectedAddress = document.querySelector('#address' + selectedAddressId).nextElementSibling.innerText.trim();
-//        var addressFields = selectedAddress.split(', ');
-//
-//        document.getElementById('address_line_1').value = addressFields[0] || '';
-//        document.getElementById('address_line_2').value = addressFields[1] || '';
-//        document.getElementById('city').value = addressFields[2] || '';
-//        document.getElementById('state').value = addressFields[3] || '';
-//        document.getElementById('country').value = addressFields[4] || '';
-//
-//        //$('#chooseAddressModal').modal('hide'); // Hide the modal after selecting address
-//    });
-//
-//
-//   
-//
-//   document.getElementById('place-order-btn').addEventListener('click', function() {
-//   console.log('Place Order button clicked'); // Log a message to the console
-//
-//        // Set the values of address fields before form submission
-//       document.getElementById('address_line_1').value = document.getElementById('address_line_1').value.trim();
-//       document.getElementById('address_line_2').value = document.getElementById('address_line_2').value.trim();
-//       document.getElementById('country').value = document.getElementById('country').value.trim();
-//       document.getElementById('state').value = document.getElementById('state').value.trim();
-//       document.getElementById('city').value = document.getElementById('city').value.trim();
-//        
-//        // Submit the form data to the server
-//       // document.getElementById('checkout-form').submit();
-//
-//
-//       // Set the values of address fields before form submission
-//    
-//    // Submit the form data to the server
-//    console.log('Submitting form data...');
-//     document.getElementById('checkout-form').submit();
-//    });
-//
-// 
 
 
 document.getElementById('choose-address-btn').addEventListener('click', function() {

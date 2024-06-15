@@ -113,15 +113,7 @@ def place_order(request, total=0, quantity=0,):
             data.phone = form.cleaned_data['phone']
             data.email = form.cleaned_data['email']
               
-            # new_address = Address()
-            # new_address.user = current_user
-            # new_address.address_line_1 = form.cleaned_data['address_line_1']
-            # new_address.address_line_2 = form.cleaned_data['address_line_2']
-            # new_address.country = form.cleaned_data['country']
-            # new_address.state = form.cleaned_data['state']
-            # new_address.city = form.cleaned_data['city']
-            # new_address.save()
-           
+            
 
             data.address_line_1 = form.cleaned_data['address_line_1']
             data.address_line_2 = form.cleaned_data['address_line_2']
@@ -179,22 +171,7 @@ def place_order(request, total=0, quantity=0,):
     return render(request, 'stores/checkout.html',context)
 
 
-
-
-        # return redirect('checkout')
-    #     form = OrderForm()
-    # return render(request, 'checkout.html', {'form': form})
     
-        
-    #     else:
-    #        return render(request, 'checkout.html', {'form': form})
-    # #     form = OrderForm()
-    # #     return render(request, 'checkout.html', {'form': form})
-    # #  # return redirect('checkout')
-    # else:
-    #     form = OrderForm()
-    #     return render(request, 'checkout.html', {'form': form})
-
 def order_complete(request):
     order_number = request.GET.get('order_number')
     transID = request.GET.get('payment_id')
@@ -222,75 +199,3 @@ def order_complete(request):
         return redirect('home')
     
 
-
-# class PlaceOrderView(View):
-#     def get(self, request):
-#         current_user = request.user
-#         cart_items = CartItem.objects.filter(user=current_user)
-#         total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-#         tax = (2 * total) / 100
-#         grand_total = total + tax
-#         form = OrderForm()
-#         context = {
-#             'form': form,
-#             'cart_items': cart_items,
-#             'total': total,
-#             'tax': tax,
-#             'grand_total': grand_total,
-#         }
-#         return render(request, 'stores/checkout.html', context)
-    
-#     def post(self, request):
-#         form = OrderForm(request.POST)
-#         if form.is_valid():
-#             current_user = request.user
-#             cart_items = CartItem.objects.filter(user=current_user)
-#             total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-#             tax = (2 * total) / 100
-#             grand_total = total + tax
-
-#             order = form.save(commit=False)
-#             order.user = current_user
-#             order.order_total = grand_total
-#             order.tax = tax
-#             order.ip = request.META.get('REMOTE_ADDR')
-#             order.save()
-
-#             yr = int(datetime.date.today().strftime('%Y'))
-#             dt = int(datetime.date.today().strftime('%d'))
-#             mt = int(datetime.date.today().strftime('%m'))
-#             d = datetime.date(yr, mt, dt)
-#             current_date = d.strftime("%Y%m%d")
-#             order_number = current_date + str(order.id)
-#             order.order_number = order_number
-#             order.save()
-
-#             for cart_item in cart_items:
-#                 cart_item.product.stock -= cart_item.quantity
-#                 cart_item.product.save()
-
-#             cart_items.delete()
-
-#             context = {
-#                 'order': order,
-#                 'cart_items': cart_items,
-#                 'total': total,
-#                 'tax': tax,
-#                 'grand_total': grand_total,
-#             }
-#             return render(request, 'orders/payments.html', context)
-
-#         # If form is not valid, render the form with errors
-#         current_user = request.user
-#         cart_items = CartItem.objects.filter(user=current_user)
-#         total = sum(cart_item.product.price * cart_item.quantity for cart_item in cart_items)
-#         tax = (2 * total) / 100
-#         grand_total = total + tax
-#         context = {
-#             'form': form,
-#             'cart_items': cart_items,
-#             'total': total,
-#             'tax': tax,
-#             'grand_total': grand_total,
-#         }
-#         return render(request, 'stores/checkout.html', context)

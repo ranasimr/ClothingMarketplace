@@ -160,8 +160,8 @@ def login(request):
             
                 
             except:
-                return redirect('dashboard')
-                # return redirect('home')
+                # return redirect('dashboard')
+                return redirect('home')
         else:
             messages.error(request,'Invalid login credentials')
             return redirect('login')
@@ -306,91 +306,6 @@ def edit_profile(request):
     }
     return render(request, 'accounts/edit_profile.html', context)
 
-
-# @login_required(login_url='login')
-# def edit_profile(request):
-#     userprofile = get_object_or_404(UserProfile, user=request.user)
-#     print(userprofile.profile_picture)
-#     if request.method == 'POST':
-#         user_form = UserForm(request.POST, instance=request.user)
-#         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
-#         if user_form.is_valid() and profile_form.is_valid():
-#             user_form.save()
-#             profile_form.save()
-
-#             # Save additional address fields if present
-#             for i in range(3):  # Assuming you allow up to 3 additional addresses
-#                 address_field_name = f'address_line_{i + 3}'  # Start from 3 as first additional address
-#                 if address_field_name in request.POST:
-#                     setattr(userprofile, address_field_name, request.POST[address_field_name])
-#             userprofile.save()
-
-#             messages.success(request, 'Your profile has been updated.')
-#             return redirect('edit_profile')
-#     else:
-#         user_form = UserForm(instance=request.user)
-#         profile_form = UserProfileForm(instance=userprofile)
-    
-#     profile_picture_url = None
-#     if userprofile.profile_picture:
-#         profile_picture_url = userprofile.profile_picture.url
-
-    
-#     context = {
-#         'user_form': user_form,
-#         'profile_form': profile_form,
-#         'userprofile': userprofile,
-#         'profile_picture_url': profile_picture_url,
-#     }
-#     return render(request, 'accounts/edit_profile.html', context)
-
-# @login_required(login_url='login')
-# def edit_profile(request):
-
-#     userprofile = get_object_or_404(UserProfile, user=request.user)
-#     print(userprofile.profile_picture)
-    
-#     if request.method == 'POST':
-#         user_form = UserForm(request.POST, instance=request.user)
-#         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
-
-#         if 'action' in request.POST and request.POST['action'] == 'add_address':
-#             # Add logic to handle adding additional address fields here
-#             pass
-#         else:
-#             # Process user profile form if the form is valid
-#             if user_form.is_valid() and profile_form.is_valid():
-#                 user_form.save()
-#                 profile_form.save()
-                
-#                 # Save additional address fields if present
-#                 for i in range(5):
-#                     address_field_name = f'address_line_{i + 1}'
-#                     if address_field_name in request.POST:
-#                         setattr(userprofile, address_field_name, request.POST[address_field_name])
-#                 userprofile.save()
-
-#                 messages.success(request, 'Your profile has been updated.')
-#                 return redirect('edit_profile')
-
-#     else:
-#         user_form = UserForm(instance=request.user)
-#         profile_form = UserProfileForm(instance=userprofile)
-    
-#     profile_picture_url = None
-#     if userprofile.profile_picture:
-#         profile_picture_url = userprofile.profile_picture.url
-
-#     additional_address_fields = []  # Initialize additional address fields
-    
-#     context = {
-#         'user_form': user_form,
-#         'profile_form': profile_form,
-#         'userprofile': userprofile,
-#         'profile_picture_url': profile_picture_url,
-#         'additional_address_fields': additional_address_fields,
-#     }
-#     return render(request, 'accounts/edit_profile.html', context)
 
 
 @login_required(login_url='login')
@@ -605,9 +520,21 @@ def order_detail(request, order_id):
 
 class AddAddressView(View):
     def get(self, request):
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            default_address = {
+                'address_line_1': user_profile.address_line_1,
+                'address_line_2': user_profile.address_line_2,
+                'city': user_profile.city,
+                'state': user_profile.state,
+                'country': user_profile.country,
+            }
+        except UserProfile.DoesNotExist:
+            default_address = None
+    
         form = AddressForm()
         saved_addresses = Address.objects.filter(user=request.user)
-        return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses})
+        return render(request, 'accounts/add_address.html', {'form': form, 'saved_addresses': saved_addresses,'default_address': default_address})
     
     def post(self, request):
         form = AddressForm(request.POST)

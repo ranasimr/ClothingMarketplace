@@ -70,3 +70,6 @@ class OrderProduct(models.Model):
 
     def __str__(self):
         return self.product.product_name
+    
+    def get_product_image_url(self):
+        return self.product.images.url if self.product.images else None

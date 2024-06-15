@@ -7,9 +7,11 @@
     {% include 'includes/alerts.html' %}
     <div class="container">
         <div class="row">
+                                
             {% include 'includes/dashboard_sidebar.html' %}
             <main class="col-md-9">
                 <article class="card">
+                    
                     <header class="card-header">
                         <strong class="d-inline-block mr-3">Edit your Profile</strong>
                     </header>
@@ -25,10 +27,28 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
+
                                 <form action="{% url 'edit_profile' %}" method="POST" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     
-                                    
+                                    {% if user_form.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {% for field, errors in user_form.errors.items %}
+                                            {% for error in errors %}
+                                                {{ field|capfirst }}: {{ error }}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                    {% endif %}
+                                    {% if profile_form.errors %}
+                                    <div class="alert alert-danger" role="alert">
+                                        {% for field, errors in profile_form.errors.items %}
+                                            {% for error in errors %}
+                                                {{ field|capfirst }}: {{ error }}
+                                            {% endfor %}
+                                        {% endfor %}
+                                    </div>
+                                   {% endif %}
                                     <div class="form-row">
                                         <div class="form-group col-md-6">
                                             <label>First Name</label>

@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from stores.models import Product, Variation
+from django.contrib import messages
 from .models import Cart, CartItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
@@ -154,10 +155,12 @@ def checkout(request, total=0, quantity=0, cart_items=None):
         
         tax = (2 * total) / 100
         grand_total = total + tax
-
+        
         # Retrieve saved addresses for the logged-in user
         if request.user.is_authenticated:
             saved_addresses = Address.objects.filter(user=request.user)
+
+       
 
         # Handle address selection
         if request.method == 'POST' and 'choose_address_btn' in request.POST:
@@ -176,6 +179,8 @@ def checkout(request, total=0, quantity=0, cart_items=None):
                 except Address.DoesNotExist:
                     pass
 
+        
+
         # Define the context dictionary
         context = {
             'total': total,
@@ -184,6 +189,7 @@ def checkout(request, total=0, quantity=0, cart_items=None):
             'tax': tax,
             'grand_total': grand_total,
             'saved_addresses': saved_addresses,
+            
         }
 
     except ObjectDoesNotExist:

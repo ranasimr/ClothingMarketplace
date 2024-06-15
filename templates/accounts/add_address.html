@@ -12,6 +12,15 @@
                         <h4 class="card-title mt-2">Add Address</h4>
                     </header>
                     <div class="card-body">
+                        <!-- Display default address if it exists -->
+                        {% if default_address %}
+                        <div>
+                            <h4>Default Address:</h4>
+                            <ul>
+                                 <li><p>{{ default_address.address_line_1 }}, {{ default_address.address_line_2 }}, {{ default_address.city }}, {{ default_address.state }}, {{ default_address.country }}</p>
+                            </ul>
+                        </div>
+                        {% endif %}
                         <!-- Display saved addresses -->
                         <div id="saved-addresses">
                             <h4>Saved Addresses:</h4>
@@ -24,16 +33,22 @@
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                     </form>
                                 </li>
+                                {% empty %}
+                                <li>No saved addresses found. You can add addresses by clicking on the "Add Address" button.</li>
+                               
                                 {% endfor %}
                             </ul>
+                            
                         </div>
                         <!-- Form for adding new address -->
                         <form id="add-address-form" method="POST">
                             {% csrf_token %}
                             <!-- Address input fields will be added here dynamically -->
                             <button type="button" id="add-address-btn" class="btn btn-primary mt-3">Add Address</button>
-                            <button type="submit" class="btn btn-success mt-3">Save</button>
-                        </form>
+                             <!-- Error message for empty fields -->
+                             <div id="error-message" class="alert alert-danger" style="display: none;"></div>
+                            </form>
+                             </form>
                     </div>
                 </article>
             </main>
@@ -43,7 +58,7 @@
 
 <style>
     .delete-btn {
-        margin-left: auto; /* Adjust margin to push button to the right end */
+        margin-left: auto; 
     }
 </style>
 
@@ -78,11 +93,43 @@
                        <input type="text" name="country" class="form-control">
                    </div>
                </div>
+               <!-- Initially hide the "Save" button -->
+                <button type="submit" id="save-address-btn" class="btn btn-success mt-3" style="display: none;">Save</button>
+                        
            `;
            addressForm.insertAdjacentHTML('beforeend', newAddressFields);
+
+           // Show the "Save" button after adding address fields
+           document.getElementById('save-address-btn').style.display = 'block';
        }
        // Event listener for the "Add Address" button
        document.getElementById('add-address-btn').addEventListener('click', addAddressFields);
+
+       // Client-side form validation
+    const form = document.getElementById('add-address-form');
+    form.addEventListener('submit', function(event) {
+        const inputs = form.querySelectorAll('input');
+        let isValid = true;
+
+        inputs.forEach(function(input) {
+            if (!input.value) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        if (!isValid) {
+            event.preventDefault(); // Prevent form submission if validation fails
+            document.getElementById('error-message').style.display = 'block';
+            document.getElementById('error-message').innerText = 'All fields must be filled.';
+        } else {
+            document.getElementById('error-message').style.display = 'none';
+       
+        
+        }
+    });
       
    });
 

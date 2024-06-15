@@ -9,6 +9,47 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 from django.http import HttpResponse
 
+import xlsxwriter
+
+def download_excel(model_admin, request, queryset):
+    model_name = model_admin.model.__name__
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename={model_name}.xlsx'
+
+    workbook = xlsxwriter.Workbook(response)
+    worksheet = workbook.add_worksheet()
+
+    ordered_queryset = queryset.order_by('id')
+    headers = ['ID', 'Category Name', 'Description', 'Total Orders']  # Define headers
+    data = [headers]
+
+    # Determine column widths based on content length
+    column_widths = [len(header) for header in headers]
+
+    for obj in ordered_queryset:
+        category_id = obj.id
+        category_name = obj.category_name
+        description = obj.description
+        total_orders = OrderProduct.objects.filter(product__category=obj).count()
+        data_row = [str(category_id), category_name, description, str(total_orders)]  # Include data
+        data.append(data_row)
+
+        # Update column widths based on cell content
+        for i, value in enumerate(data_row):
+            column_widths[i] = max(column_widths[i], len(value))
+
+    for col_num, width in enumerate(column_widths):
+        worksheet.set_column(col_num, col_num, width + 2)  # Adding some padding
+
+    for row_num, row_data in enumerate(data):
+        for col_num, cell_data in enumerate(row_data):
+            worksheet.write(row_num, col_num, cell_data)
+
+    workbook.close()
+    return response
+
+download_excel.short_description = "Download Selected Items as Excel"
+
 def download_pdf(model_admin, request, queryset):
     model_name = model_admin.model.__name__
     response = HttpResponse(content_type='application/pdf')
@@ -66,7 +107,7 @@ download_pdf.short_description = "Download Selected Items as PDF"
 class CategoryAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('category_name',)}
     list_display = ('category_name', 'slug', 'total_orders')
-    actions = [download_pdf]
+    actions = [download_pdf, download_excel]
 
     def total_orders(self, obj):
         # Calculate the total number of orders for this category

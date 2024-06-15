@@ -20,25 +20,29 @@
           <img src="{% static 'images/slide2-2.jpg' %}" class="d-block w-100" alt="First slide">
           <div class="carousel-caption d-none d-md-block">
               
+                 
+            
+              
+           
+              
               <div class="year">
                 <h1>2024</h1>
                 </div>
               <div class="caption">
                   <p>Latest collections</p>
-              <h1><h2>New Arrivals</h2><span id="span2"></span></h1>
+              <h1><h2>New Arrivals</h2><span id="span2">30%</span>off</h1>
+             
               </div>
-              
               <div class="text-left">
-                  <div class="col-md-4 offset-md-2">
-                      <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p> -->
-                      {% for category in links %}
-                        {% if category.category_name == "Women ethnic" %}
-                          <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
-                        {% endif %}
-                      {% endfor %}
-                  </div>
-              </div>
-              
+                <div class="col-md-4 offset-md-2">
+                    <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p> -->
+                    {% for category in links %}
+                      {% if category.category_name == "Women ethnic" %}
+                        <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
+                      {% endif %}
+                    {% endfor %} 
+                </div>
+            </div>
               
             </div>
         </div>
@@ -75,8 +79,6 @@
                   Latest Men's Collection
                </div>
               <div class="text-left">
-                  
-                <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p> -->
                 {% for category in links %}
                 {% if category.category_name == "Men" %}
                     <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
@@ -98,8 +100,7 @@
               
               <div class="text-left">
                  
-                <!-- <p><a href="{% url 'store' %}" class="btn btn-custom">Shop Now!!</a></p>
-                   -->
+                
                 {% for category in links %}
                 {% if category.category_name == "tshirts" %}
                     <p><a href="{{ category.get_url }}" class="btn btn-custom">Shop Now!!</a></p>
@@ -125,18 +126,16 @@
 
 </div>
 
-</div> <!-- container //  -->
+</div> 
 </section>
-<!-- ========================= SECTION MAIN END// ========================= -->
 
-<!-- ========================= SECTION  ========================= -->
 <section class="section-name padding-y-sm">
 <div class="container">
 
 <header class="section-heading">
     <a href="{% url 'store' %}" class="btn btn-outline-primary float-right">See all</a>
     <h3 class="section-title">Popular products </h3>
-</header><!-- sect-heading -->
+</header>
 
 <div class="row">
     {% for product in products|slice:":20"%}
@@ -149,18 +148,9 @@
 				<a href="{% url 'product_details' product.category.slug product.slug %}" class="title">{{product.product_name}}</a>
 				<div class="price mt-1">
           ₹{{product.price}}
-          {% comment %} <div class="price">
-            <span class="current-price">₹{{product.price}}</span>
-           
-            <span class="original-price">₹{{ discounted_price }}</span>
-            <span class="discount">(30% OFF)
-            </span>
           
-          </div> {% endcomment %}
           
-        
-          
-        </div> <!-- price-wrap.// -->
+        </div> 
 				<div class="rating-star">
                     <span>
                         <i class="fa fa-star{% if product.averageReview < 0.5 %}-o{% elif single_product.averageReview >= 0.5 and single_product.averageReview < 1 %}-half-o {% endif %}" aria-hidden="true"></i>
@@ -174,7 +164,7 @@
                 </div>
 			</figcaption>
 		</div>
-	</div> <!-- col.// -->
+	</div> 
    
 
 
@@ -221,7 +211,7 @@
  }
  #span2{
      font-size: 6rem;
-     margin-left: 70px;
+     margin-left: 60px;
      
  }
   .year h1{

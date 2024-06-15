@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.db.models import Count
 from stores.models import  Product,Variation,ReviewRating,ProductGallery
 import admin_thumbnails
-
+import xlsxwriter
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter
@@ -10,6 +10,49 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.lib import colors
 from django.http import HttpResponse
 
+import xlsxwriter
+def download_excel(model_admin, request, queryset):
+    model_name = model_admin.model.__name__
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename={model_name}.xlsx'
+
+    workbook = xlsxwriter.Workbook(response)
+    worksheet = workbook.add_worksheet()
+
+    ordered_queryset = queryset.order_by('id')
+
+    # Define excluded fields
+    excluded_fields = ['slug', 'images', 'modified_date', 'created_date']
+
+    # Define headers
+    headers = [field.verbose_name for field in model_admin.model._meta.fields if field.name not in excluded_fields]
+    headers.append('Orders')
+    data = [headers]
+
+    # Determine column widths based on content length
+    column_widths = [len(header) for header in headers]
+
+    for obj in ordered_queryset:
+        data_row = [str(getattr(obj, field.name)) for field in model_admin.model._meta.fields if field.name not in excluded_fields]
+        total_orders = obj.orderproduct_set.count()
+        data_row.append(str(total_orders))
+        data.append(data_row)
+
+        # Update column widths based on cell content
+        for i, value in enumerate(data_row):
+            column_widths[i] = max(column_widths[i], len(value))
+
+    for col_num, width in enumerate(column_widths):
+        worksheet.set_column(col_num, col_num, width + 2)  # Adding some padding
+
+    for row_num, row_data in enumerate(data):
+        for col_num, cell_data in enumerate(row_data):
+            worksheet.write(row_num, col_num, cell_data)
+
+    workbook.close()
+    return response
+
+download_excel.short_description = "Download Selected Items as Excel"
 
 
 def download_pdf(self,request,queryset):
@@ -94,7 +137,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('product_name', 'description', 'price','stock', 'category', 'images', 'created_date', 'modified_date', 'is_available','get_total_orders')
     prepopulated_fields={'slug':('product_name',)}
     inlines = [ProductGalleryInline]
-    actions =[download_pdf]
+    actions =[download_pdf , download_excel]
 
     def get_queryset(self, request):
         queryset = super().get_queryset(request)
@@ -112,7 +155,7 @@ class VariationAdmin(admin.ModelAdmin):
     list_display = ('product', 'variation_category', 'variation_value','is_active')
     list_editable =('is_active',)
     list_filter= ('product', 'variation_category', 'variation_value')
-    actions =[download_pdf]
+    actions =[download_pdf, download_excel]
 admin.site.register(Product,ProductAdmin)
 admin.site.register(Variation,VariationAdmin)
 admin.site.register(ReviewRating)

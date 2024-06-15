@@ -32,8 +32,8 @@ class OrderForm(forms.ModelForm):
         if address_line_1 and len(address_line_1.split()) > 50:
             raise forms.ValidationError("Address line 1 can only contain up to 50 words.")
         # Add validation for alphanumeric characters and specific symbols here
-        if address_line_1 and not all(char.isalnum() or char in ' /\\,#' for char in address_line_1):
-            raise forms.ValidationError("Address line 1 can only contain alphanumeric characters and /\\,# symbols.")
+        if address_line_1 and not all(char.isalnum() or char in ' /\\,.#' for char in address_line_1):
+            raise forms.ValidationError("Address line 1 can only contain alphanumeric characters and /\\,.# symbols.")
         return address_line_1
 
     def clean_address_line_2(self):
@@ -41,8 +41,8 @@ class OrderForm(forms.ModelForm):
         if address_line_2 and len(address_line_2.split()) > 50:
             raise forms.ValidationError("Address line 2 can only contain up to 50 words.")
         # Add validation for alphanumeric characters and specific symbols here
-        if address_line_2 and not all(char.isalnum() or char in ' /\\,#' for char in address_line_2):
-            raise forms.ValidationError("Address line 2 can only contain alphanumeric characters and /\\,# symbols.")
+        if address_line_2 and not all(char.isalnum() or char in ' /\\,#.' for char in address_line_2):
+            raise forms.ValidationError("Address line 2 can only contain alphanumeric characters and /\\,.# symbols.")
         return address_line_2
 
     def clean_country(self):
